@@ -27,5 +27,3 @@ def test_sphere_mesh():
     sphere_mesh_file = os.path.join(os.path.dirname(__file__), "test/sphere_mesh.obj")
     generate_mesh(sphere_points_file, sphere_mesh_file, delimiter=",")
     visualize_mesh(sphere_mesh_file)
-
-test_sphere_mesh()
