@@ -1,7 +1,6 @@
 import numpy as np
 import pyvista as pv
 import pandas as pd
-from visualize_mesh import visualize_mesh
 import os
 
 def generate_mesh(points_filename: str, output_filename:str, delimiter: str):
@@ -11,6 +10,7 @@ def generate_mesh(points_filename: str, output_filename:str, delimiter: str):
     surface_mesh.save(output_filename)
 
 def test_sphere_mesh():
+    from visualize_mesh import visualize_mesh
     def save_test_sphere_mesh(output_filename: str):
         N = 1000
         r = 1
