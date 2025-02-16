@@ -13,8 +13,8 @@ xy = np.stack((x, y), axis=2)
 cell = np.trunc(xy).astype(np.int32)
 cell_corners = cell[:,:,np.newaxis,:] + [[0, 0], [1, 0], [0, 1], [1, 1]]
 distance_vectors = xy[:,:,np.newaxis,:] - cell_corners
-gradient_vectors = np.random.rand(grid_width, grid_height, 2)-0.5
-gradient_vectors = gradient_vectors / np.linalg.norm(gradient_vectors, axis=2)[:,:,np.newaxis]
+gradient_choices = np.array([[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, -1]])
+gradient_vectors = gradient_choices[np.random.randint(len(gradient_choices), size=(grid_width, grid_height))]
 corner_gradients = gradient_vectors[cell_corners[:,:,:,0], cell_corners[:,:,:,1]]
 dot_corners = np.einsum('xycd,xycd->xyc', distance_vectors, corner_gradients)
 unit_xy = xy - cell
