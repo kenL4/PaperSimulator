@@ -1,6 +1,6 @@
 from krita import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QPixmap, QIcon
+from PyQt5.QtGui import *
 from .texture import overlay_canvas
 import os
 
@@ -9,45 +9,45 @@ class PaperDocker(DockWidget):
         super().__init__()
         self.setWindowTitle("Paper")
 
-        # Create list of textures
-        self.mainWidget = QListWidget()
+        self.mainWidget = QWidget(self)
         self.setWidget(self.mainWidget)
 
-        # Load textures from assets folder
-        self.load_textures()
+        self.papers = QListWidget()
+        self.papers.setViewMode(QListWidget.IconMode)
+        self.papers.setIconSize(QSize(64, 64))
+        self.papers.setResizeMode(QListWidget.Adjust)
 
-        # Connect click event to apply texture
-        self.mainWidget.itemClicked.connect(self.handle_item_click)
+        layout = QVBoxLayout()
+        layout.addWidget(self.papers)
+        self.mainWidget.setLayout(layout)
 
-    def load_textures(self):
-        """Loads texture images from the assets folder into the docker."""
-        assets_folder = os.path.join(os.path.dirname(__file__), "assets")
-        
-        if not os.path.exists(assets_folder):
-            print("Assets folder not found:", assets_folder)
-            return
-        
-        for file_name in os.listdir(assets_folder):
-            if file_name.lower().endswith(('.png', '.jpg', '.jpeg')):
-                texture_path = os.path.join(assets_folder, file_name)
+        self.load_paper()
 
-                # Create list item with icon
-                item = QListWidgetItem(file_name)
-                pixmap = QPixmap(texture_path).scaled(64, 64)  # Resize for display
-                item.setIcon(QIcon(pixmap))
+        self.papers.itemClicked.connect(self.click)
 
-                # Store full path in the item 
-                item.setData(32, texture_path)
+    def load_paper(self):
+        """Loads paper from assets folder into docker."""
+        assets = os.path.join(os.path.dirname(__file__), "../", "assets")
 
-                self.mainWidget.addItem(item)
+        for file in os.listdir(assets):
+            path = os.path.join(assets, file)
 
-    def handle_item_click(self, item):
-        """Handles item clicks, calling functions to apply texture and overlay canvas."""
-        texture_path = item.data(32)  # Get stored file path
+            pixmap = QPixmap(path).scaled(64, 64)
+            
+            item = QListWidgetItem()
+            item.setIcon(QIcon(pixmap))
+            item.setData(32, path)  
+            item.setToolTip(file) 
 
-        # Call the placeholder functions for Elaine and Ken to implement
+            self.papers.addItem(item)
+
+    def click(self, item):
+        """Calls texture functions when an item is clicked."""
+        texture_path = item.data(32) 
+
+        # Placeholder functions for Elaine and Ken to implement.
         self.apply_texture(texture_path)
-        overlay_canvas(self, "01_canvas.png")
+        overlay_canvas("03_default-paper.png")
 
     def apply_texture(self, texture_path):
         """
