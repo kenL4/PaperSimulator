@@ -1,7 +1,7 @@
 from krita import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap, QIcon
-from .modules.texture import overlay_canvas
+from .texture import overlay_canvas
 import os
 
 class PaperDocker(DockWidget):
@@ -47,7 +47,7 @@ class PaperDocker(DockWidget):
 
         # Call the placeholder functions for Elaine and Ken to implement
         self.apply_texture(texture_path)
-        overlay_canvas(self, "03_default-paper.png")
+        overlay_canvas(self, "01_canvas.png")
 
     def apply_texture(self, texture_path):
         """
@@ -57,7 +57,3 @@ class PaperDocker(DockWidget):
 
     def canvasChanged(self, canvas):
         pass
-
-Krita.instance().addDockWidgetFactory(DockWidgetFactory("pDocker", DockWidgetFactoryBase.DockRight, PaperDocker))
-
-
