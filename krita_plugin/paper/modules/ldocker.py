@@ -4,128 +4,85 @@ from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 #from .lighting import *
 
-class AngleSelector(QWidget):
+class Angle(QWidget):
     def __init__(self):
         super().__init__()
 
-        # Create Layout
-        main_layout = QVBoxLayout()
-        control_layout = QHBoxLayout()
+        self.pixmap = QPixmap(100, 100)
+        self.pixmap.fill(Qt.transparent)
 
-        # Custom Circular Display (Rotating Image)
-        self.image_label = QLabel()
-        self.base_pixmap = QPixmap(100, 100)
-        self.base_pixmap.fill(Qt.transparent)
-        self.draw_circle_with_arrow(self.base_pixmap)
-        self.image_label.setPixmap(self.base_pixmap)
+        self.draw()
 
-        # Angle Slider (Horizontal for Logical Control)
+        self.label = QLabel()
+        self.label.setPixmap(self.pixmap)
+
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setRange(0, 360)
-        self.slider.setValue(0)
+        self.slider.valueChanged.connect(self.sync)
 
-        # Angle Display (Numeric Input)
         self.spinBox = QDoubleSpinBox()
         self.spinBox.setRange(0, 360)
         self.spinBox.setSingleStep(0.1)
         self.spinBox.setSuffix("°")
+        self.spinBox.valueChanged.connect(self.sync)
 
-        # Sync Slider and SpinBox
-        self.slider.valueChanged.connect(self.sync_spinbox)
-        self.spinBox.valueChanged.connect(self.sync_slider)
+        layout = QHBoxLayout()
+        layout.addWidget(self.slider)
+        layout.addWidget(self.spinBox)
 
-        # Add Widgets to Layout
-        control_layout.addWidget(self.slider)
-        control_layout.addWidget(self.spinBox)
+        self.setLayout(QVBoxLayout())
+        self.layout().addWidget(self.label, alignment=Qt.AlignCenter)
+        self.layout().addLayout(layout)
 
-        main_layout.addWidget(self.image_label, alignment=Qt.AlignCenter)
-        main_layout.addLayout(control_layout)
-        self.setLayout(main_layout)
-
-    def sync_spinbox(self, value):
-        self.spinBox.setValue(value)
-        self.update_angle_display(value)
-
-    def sync_slider(self, value):
-        self.slider.setValue(int(value))
-        self.update_angle_display(value)
-
-    def update_angle_display(self, angle):
-        """ Rotates the arrow to match the selected angle. """
-        rotated_pixmap = self.base_pixmap.transformed(QTransform().rotate(-angle))
-        self.image_label.setPixmap(rotated_pixmap)
-
-    def draw_circle_with_arrow(self, pixmap):
-        """ Draws a simple compass-like indicator with an arrow pointing to 0° (right). """
-        painter = QPainter(pixmap)
-        painter.setRenderHint(QPainter.Antialiasing)
-        
-        # Draw outer circle
+    def draw(self):
+        painter = QPainter(self.pixmap)        
         painter.setPen(Qt.black)
         painter.drawEllipse(10, 10, 80, 80)
-
-        # Draw center arrow (pointing right initially, 0° direction)
         painter.drawLine(50, 50, 90, 50)
         painter.end()
 
-class LightIntensitySlider(QWidget):
+    def sync(self, value):
+        self.slider.setValue(int(value))
+        self.spinBox.setValue(value)
+
+        self.pixmap = self.pixmap.transformed(QTransform().rotate(-value))
+        self.label.setPixmap(self.pixmap)
+
+class Intensity(QWidget):
     def __init__(self):
         super().__init__()
 
-        # Main Layout
-        main_layout = QVBoxLayout()
+        self.label = QLabel()
+        self.label.setFixedHeight(10)
+        self.label.setStyleSheet("background-color: black; border-radius: 5px;")
 
-        # Brightness Display (Thinner)
-        self.light_label = QLabel()
-        self.light_label.setFixedHeight(30)  # Thinner appearance
-        self.light_label.setStyleSheet("background-color: black; border-radius: 5px;")
-
-        # Horizontal Layout for Slider & SpinBox
-        control_layout = QHBoxLayout()
-
-        # Slider for Light Intensity (0% to 100%)
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setRange(0, 100)
-        self.slider.setValue(0)  # Start at 0%
         self.slider.setTickPosition(QSlider.TicksBelow)
         self.slider.setTickInterval(10)
+        self.slider.valueChanged.connect(self.sync)
 
-        # SpinBox for Numeric Input
         self.spinBox = QDoubleSpinBox()
         self.spinBox.setRange(0, 100)
-        self.spinBox.setSingleStep(1.0)  # Step size
-        self.spinBox.setSuffix("%")  # Show percentage symbol
-        self.spinBox.setValue(0)  # Start at 0%
-        self.spinBox.setFixedWidth(60)  # Keep it compact
+        self.spinBox.setSingleStep(0.1)
+        self.spinBox.setSuffix("%")
+        self.spinBox.valueChanged.connect(self.sync)
 
-        # Sync Slider and SpinBox
-        self.slider.valueChanged.connect(self.sync_spinbox)
-        self.spinBox.valueChanged.connect(self.sync_slider)
+        layout = QHBoxLayout()
+        layout.addWidget(self.slider)
+        layout.addWidget(self.spinBox)
 
-        # Add Slider & SpinBox to Horizontal Layout
-        control_layout.addWidget(self.slider)
-        control_layout.addWidget(self.spinBox)
+        self.setLayout(QVBoxLayout())
+        self.layout().addWidget(self.label)
+        self.layout().addLayout(layout)
 
-        # Add Widgets to Main Layout
-        main_layout.addWidget(self.light_label)
-        main_layout.addLayout(control_layout)
-        self.setLayout(main_layout)
-
-    def sync_spinbox(self, value):
-        """ Sync SpinBox when Slider changes. """
-        self.spinBox.setValue(value)
-        self.update_light_intensity(value)
-
-    def sync_slider(self, value):
-        """ Sync Slider when SpinBox changes. """
+    def sync(self, value):
         self.slider.setValue(int(value))
-        self.update_light_intensity(value)
+        self.spinBox.setValue(value)
 
-    def update_light_intensity(self, value):
-        """ Update label background based on intensity level. """
-        brightness = int((value / 100) * 255)  # Convert 0-100% to 0-255 color range
+        brightness = int((value / 100) * 255)
         color = f"rgb({brightness}, {brightness}, {brightness})"
-        self.light_label.setStyleSheet(f"background-color: {color}; border-radius: 5px;")
+        self.label.setStyleSheet(f"background-color: {color}; border-radius: 5px;")
 
 class LightDocker(DockWidget):
     def __init__(self):
@@ -135,20 +92,19 @@ class LightDocker(DockWidget):
         mainWidget = QWidget(self)
         self.setWidget(mainWidget)
 
-        self.angle = AngleSelector()
-        self.intensity = LightIntensitySlider()
+        self.angle = Angle()
+        self.intensity = Intensity()
+
         button = QPushButton("Apply", mainWidget)
-        button.clicked.connect(self.light)
+        button.clicked.connect(self.click)
 
         mainWidget.setLayout(QVBoxLayout())
         mainWidget.layout().addWidget(self.angle)
         mainWidget.layout().addWidget(self.intensity)
         mainWidget.layout().addWidget(button)
 
-    def light(self):
+    def click(self):
         # Placeholder function for Will and Jonathan.
-        angle = self.angle.slider.value()
-        intensity = self.intensity.slider.value()
         pass
 
     def canvasChanged(self, canvas):
