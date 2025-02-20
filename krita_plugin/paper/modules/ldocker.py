@@ -45,8 +45,8 @@ class Angle(QWidget):
         self.slider.setValue(int(value))
         self.spinBox.setValue(value)
 
-        self.pixmap = self.pixmap.transformed(QTransform().rotate(-value))
-        self.label.setPixmap(self.pixmap)
+        pixmap = self.pixmap.transformed(QTransform().rotate(-value))
+        self.label.setPixmap(pixmap)
 
 class Intensity(QWidget):
     def __init__(self):
