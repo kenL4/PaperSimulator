@@ -60,7 +60,7 @@ def gen_funny_normal_map(width, height):
     magnitude = np.linalg.norm(result, axis=-1, keepdims=True)
     result = result / magnitude
     return result
-     
+
     
 
 app = Krita.instance()
