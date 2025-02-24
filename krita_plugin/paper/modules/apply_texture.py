@@ -55,5 +55,3 @@ def apply_texture(texture_path, PATTERN_NAME):
         doc.refreshProjection()
     else:
         print("Failed to find pattern!")
-
-apply_texture("/home/ken/Documents/Part1B/Lent/GroupProject/PaperSimulator/krita_plugin/paper/assets/papertest.jpg", "papertest.jpg")
