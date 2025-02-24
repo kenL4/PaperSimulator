@@ -35,16 +35,18 @@ class PaperDocker(DockWidget):
             item = QListWidgetItem()
             item.setIcon(QIcon(pixmap))
             item.setData(32, path)
+            item.setData(33, file)
             item.setToolTip(file)
 
             papers.addItem(item)
 
     def click(self, item):
-        path = item.data(32) 
+        path = item.data(32)
+        file = item.data(33)
 
         # Placeholder functions for Elaine and Ken to implement.
-        apply_texture(path)
-        overlay_canvas("papertest.jpg")
+        apply_texture(path, file)
+        overlay_canvas(file)
 
     def canvasChanged(self, canvas):
         pass
