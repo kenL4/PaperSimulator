@@ -17,8 +17,7 @@ def make_texture(texture_path, pattern_name):
 
 def apply_texture(texture_path, PATTERN_NAME):
     # Ensure pattern exists
-    assets_folder = os.path.join(os.path.dirname(__file__), "../assets")
-    path = make_texture(os.path.join(assets_folder, texture_path), PATTERN_NAME)
+    path = make_texture(texture_path, PATTERN_NAME)
     
     # Apply paper file as pattern
     patterns_manager = Krita.instance().resources("pattern")
@@ -36,6 +35,7 @@ def apply_texture(texture_path, PATTERN_NAME):
         
         # Set the current pattern
         view.setCurrentPattern(pattern)
+        view.activateResource("pattern")
         
         doc = Krita.instance().activeDocument()
         doc.refreshProjection()
