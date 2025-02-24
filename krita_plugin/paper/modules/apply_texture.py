@@ -33,13 +33,11 @@ def apply_texture(texture_path):
     view = Krita.instance().activeWindow().activeView()
     if view and pattern:
         # Enable patterns
-        preset = Preset(view.currentBrushPreset())
-        print(preset)
+        # preset = Preset(view.currentBrushPreset())
+        # print(preset)
         
-        # Overwrite pattern data
-        pattern = view.currentPattern()
-        pattern.setImage(QImage(path))
-        view.activateResource(pattern)
+        # Set the current pattern
+        view.setCurrentPattern(pattern)
         
         doc = Krita.instance().activeDocument()
         doc.refreshProjection()
