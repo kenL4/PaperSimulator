@@ -15,9 +15,7 @@ def make_texture(texture_path, pattern_name):
     print(pattern_file_path)
     return pattern_file_path
 
-def apply_texture(texture_path):
-    PATTERN_NAME = "papertest.jpg"
-    
+def apply_texture(texture_path, PATTERN_NAME):
     # Ensure pattern exists
     assets_folder = os.path.join(os.path.dirname(__file__), "../assets")
     path = make_texture(os.path.join(assets_folder, texture_path), PATTERN_NAME)
@@ -43,5 +41,3 @@ def apply_texture(texture_path):
         doc.refreshProjection()
     else:
         print("Failed to apply pattern!")
-
-apply_texture("papertest.jpg")
