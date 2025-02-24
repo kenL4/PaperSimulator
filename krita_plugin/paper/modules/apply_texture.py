@@ -34,6 +34,7 @@ def apply_texture(texture_path, PATTERN_NAME):
         
         written = False
         for param in root.findall("param"):
+            print(param.attrib["name"])
             if param is not None and param.attrib["name"] == "Texture/Pattern/Enabled":
                 written = True
                 param.text = "![CDATA[true]]"
@@ -44,14 +45,17 @@ def apply_texture(texture_path, PATTERN_NAME):
             root.append(pattern_param)
         
         xml_string = ET.tostring(root, encoding="utf-8").decode("utf-8")
-        # print(xml_string)
         view.setCurrentBrushPreset(preset.fromXML(xml_string))
         
         # Set the current pattern
         view.activateResource(pattern)
+        # NOTE: This seems to set a 'Fill Pattern' but doesn't affect Brush Pattern
+        # TODO: FIX
         view.setCurrentPattern(pattern)
         
         doc = Krita.instance().activeDocument()
         doc.refreshProjection()
     else:
         print("Failed to find pattern!")
+
+apply_texture("/home/ken/Documents/Part1B/Lent/GroupProject/PaperSimulator/krita_plugin/paper/assets/papertest.jpg", "papertest.jpg")
