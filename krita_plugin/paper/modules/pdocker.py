@@ -2,6 +2,7 @@ from krita import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from .texture import overlay_canvas
+from .apply_texture import apply_texture
 import os
 
 class PaperDocker(DockWidget):
@@ -39,11 +40,11 @@ class PaperDocker(DockWidget):
             papers.addItem(item)
 
     def click(self, item):
-        texture = item.data(32) 
+        path = item.data(32) 
 
         # Placeholder functions for Elaine and Ken to implement.
-        #apply_texture(texture)
-        overlay_canvas("03_default-paper.png")
+        apply_texture(path)
+        overlay_canvas("papertest.jpg")
 
     def canvasChanged(self, canvas):
         pass
