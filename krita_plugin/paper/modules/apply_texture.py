@@ -2,6 +2,7 @@ from krita import *
 import shutil
 import os
 import xml.etree.ElementTree as ET 
+import hashlib
 
 def make_texture(texture_path, pattern_name):
     path = Krita.instance().readSetting("", "ResourceDirectory", None)
@@ -30,18 +31,50 @@ def apply_texture(texture_path, PATTERN_NAME):
     if view and pattern:
         # Enable patterns
         preset = Preset(view.currentBrushPreset())
+        print(preset.toXML())
         root = ET.fromstring(preset.toXML())
         
-        written = False
+        enabled = False
+        named = False
+        md5ed = False
+        md5sumed = False
         for param in root.findall("param"):
-            print(param.attrib["name"])
             if param is not None and param.attrib["name"] == "Texture/Pattern/Enabled":
-                written = True
-                param.text = "![CDATA[true]]"
+                enabled = True
+                param.text = "true"
+            if param is not None and param.attrib["name"] == "Texture/Pattern/PatternFileName":
+                named = True
+                param.text = PATTERN_NAME
+            # if param is not None and param.attrib["name"] == "Texture/Pattern/PatternMD5":
+            #     print(param.text)
+            #     md5ed = True
+            #     with open(texture_path, "rb") as f:
+            #         param.text = hashlib.md5(f.read()).digest()
+            if param is not None and param.attrib["name"] == "Texture/Pattern/PatternMD5Sum":
+                md5sumed = True
+                with open(texture_path, "rb") as f:
+                    param.text = hashlib.md5(f.read()).hexdigest()
                 
-        if not written:
-            pattern_param = ET.Element("param", type="string", name="Texture/Pattern/Enabled")
-            pattern_param.text = "![CDATA[true]]"
+        if not enabled:
+            pattern_param = ET.Element("param", type="internal", name="Texture/Pattern/Enabled")
+            pattern_param.text = "true"
+            root.append(pattern_param)
+        
+        if not named:
+            pattern_param = ET.Element("param", type="string", name="Texture/Pattern/PatternFileName")
+            pattern_param.text = PATTERN_NAME
+            root.append(pattern_param)
+        
+        # if not md5ed:
+        #     pattern_param = ET.Element("param", type="string", name="Texture/Pattern/PatternMD5")
+        #     with open(texture_path, "rb") as f:
+        #         pattern_param.text = hashlib.md5(f.read()).digest()
+        #     root.append(pattern_param)
+        
+        if not md5sumed:
+            pattern_param = ET.Element("param", type="string", name="Texture/Pattern/PatternMD5Sum")
+            with open(texture_path, "rb") as f:
+                pattern_param.text = hashlib.md5(f.read()).hexdigest()
             root.append(pattern_param)
         
         xml_string = ET.tostring(root, encoding="utf-8").decode("utf-8")
@@ -49,8 +82,6 @@ def apply_texture(texture_path, PATTERN_NAME):
         
         # Set the current pattern
         view.activateResource(pattern)
-        # NOTE: This seems to set a 'Fill Pattern' but doesn't affect Brush Pattern
-        # TODO: FIX
         view.setCurrentPattern(pattern)
         
         doc = Krita.instance().activeDocument()
