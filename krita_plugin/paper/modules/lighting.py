@@ -33,6 +33,20 @@ def get_normal_map_from_obj_file(objFile,origHeight,origWidth):
 
 SHADOW_LAYER_NAME = "shadow"
 
+
+def reflect_pattern(top_left):
+    #takes numpy array and reflects it to create a pattern tile that is 4 times the size of the regular array
+    top_right = np.fliplr(top_left)
+    bottom_left = np.flipud(top_left)
+    bottom_right = np.fliplr(bottom_left)
+
+    top = np.append(top_left, top_right, 1)
+    bottom = np.append(bottom_left, bottom_right, 1)
+    new_arr = np.append(top, bottom, 0)
+
+    return new_arr
+
+
 def dot(u, v): #return the dot product of  two vectors
     if len(u) != len(v):
         raise Exception("vectors are the not the same dimensions")
