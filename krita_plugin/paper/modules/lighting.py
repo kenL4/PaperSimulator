@@ -117,7 +117,7 @@ class Shading:
         doc = app.activeDocument()
 
         shadow_node = doc.nodeByName(SHADOW_LAYER_NAME)
-        if shadow_node == 0:
+        if shadow_node == None:
             shadow_node = doc.createNode(SHADOW_LAYER_NAME, "paintLayer")
             doc.rootNode().addChildNode(shadow_node, None)
 
