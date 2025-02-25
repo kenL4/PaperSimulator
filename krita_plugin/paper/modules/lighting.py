@@ -3,6 +3,17 @@ import struct
 import math
 import numpy as np
 import time
+import pyvista as pv
+import get_mesh_data
+
+
+def get_normal_map_from_mesh_file(meshFile,origHeight,origWidth):
+    #For prototype1 height and width is 1623x1125
+    meshNormals = get_mesh_data.get_mesh_with_surface_normals(meshFile)
+    normals = meshNormals['Normals'].tolist()
+    normalMap = [normals[origWidth*i:origWidth*(i+1)] for i in range(origHeight)]
+
+    return (origHeight,origWidth,normalMap)
 
 def dot(u, v): #return the dot product of  two vectors
     if len(u) != len(v):
