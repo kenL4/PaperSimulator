@@ -7,11 +7,23 @@ import pyvista as pv
 import sys
 sys.path.append("mesh_utils")
 import get_mesh_data
+import pointCloudGen
 
 
-def get_normal_map_from_mesh_file(meshFile,origHeight,origWidth):
+def get_normal_map_from_heightmap(heightmap_np):
+    (height,width) = heightmap_np.shape()
+    mesh = pointCloudGen.heightmap_to_mesh()
+    mesh = mesh.compute_normals(cell_normals = False, point_normals = True)
+    normals = mesh['Normals'].tolist()
+    normalMap = [normals[width*i:width*(i+1)] for i in range(height)]
+    return (height,width,normalMap)
+
+
+    
+
+def get_normal_map_from_obj_file(objFile,origHeight,origWidth):
     #For prototype1 height and width is 1623x1125
-    meshNormals = get_mesh_data.get_mesh_with_surface_normals(meshFile)
+    meshNormals = get_mesh_data.get_mesh_with_surface_normals(objFile)
     normals = meshNormals['Normals'].tolist()
 
     #Map to 3D array
