@@ -4,6 +4,8 @@ import math
 import numpy as np
 import time
 import pyvista as pv
+import sys
+sys.path.append("mesh_utils")
 import get_mesh_data
 
 
@@ -11,6 +13,8 @@ def get_normal_map_from_mesh_file(meshFile,origHeight,origWidth):
     #For prototype1 height and width is 1623x1125
     meshNormals = get_mesh_data.get_mesh_with_surface_normals(meshFile)
     normals = meshNormals['Normals'].tolist()
+
+    #Map to 3D array
     normalMap = [normals[origWidth*i:origWidth*(i+1)] for i in range(origHeight)]
 
     return (origHeight,origWidth,normalMap)
@@ -72,7 +76,6 @@ def gen_funny_normal_map(width, height):
     result = result / magnitude
     return result
 
-    
 
 app = Krita.instance()
 
