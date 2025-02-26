@@ -13,6 +13,8 @@ class PaperDocker(DockWidget):
         mainWidget = QWidget(self)
         self.setWidget(mainWidget)
 
+        self.uniqueId = None
+
         papers = QListWidget()
         papers.setViewMode(QListWidget.IconMode)
         papers.setIconSize(QSize(64, 64))
@@ -45,8 +47,8 @@ class PaperDocker(DockWidget):
         file = item.data(33)
 
         # Placeholder functions for Elaine and Ken to implement.
+        self.uniqueId = overlay_canvas(file, self.uniqueId)
         apply_texture(path, file)
-        overlay_canvas(file)
 
     def canvasChanged(self, canvas):
         pass
