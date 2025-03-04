@@ -111,7 +111,7 @@ class LightDocker(DockWidget):
         angle_radians = self.angle.slider.value() / 180 * math.pi
         direction[0] = math.cos(angle_radians)
         direction[1] = math.sin(angle_radians)
-        direction *= self.intensity.slider.value() / 50
+        direction *= self.intensity.slider.value() / 15
 
         if (self.shading.normal_map.shape[0] == 0):
             app = Krita.instance()
