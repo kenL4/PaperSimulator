@@ -15,8 +15,6 @@ latent_image_dims = 4
 batch_size = 64
 train_iterations = 6000
 save_frequency = 500
-generator_weights_fname = "generator_weights.pth"
-discriminator_weights_fname = "discriminator_weights.pth"
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"PyTorch device = {device}")
@@ -27,7 +25,7 @@ assert generator.SCALE_FACTOR == generator.SCALE_FACTOR
 
 patch_size = latent_image_dims * generator.SCALE_FACTOR
 
-dataset = PatchDataset("crumpled_paper_small.png", patch_size, mean_patch=True)
+dataset = PatchDataset("./examples/crumpled-train.png", patch_size, mean_patch=False)
 patch_loader = torch.utils.data.DataLoader(
     dataset,
     batch_size=batch_size,
@@ -37,20 +35,6 @@ patch_loader = torch.utils.data.DataLoader(
 
 generator.apply(init_weights)
 discriminator.apply(init_weights)
-if os.path.isfile(generator_weights_fname):
-    print("LOADING EXISTING GENERATOR MODEL")
-    generator.load_state_dict(
-        torch.load(
-            generator_weights_fname, weights_only=True, map_location=device
-        )
-    )
-if os.path.isfile(discriminator_weights_fname):
-    print("LOADING EXISTING DISCRIMINATOR MODEL")
-    discriminator.load_state_dict(
-        torch.load(
-            discriminator_weights_fname, weights_only=True, map_location=device
-            )
-        )
 
 discriminator_optimizer = torch.optim.Adam(discriminator.parameters(), lr=2e-4, betas=(0.5, 0.999))
 generator_optimizer = torch.optim.Adam(generator.parameters(), lr=2e-4, betas=(0.5, 0.999))
@@ -64,7 +48,7 @@ for i in range(train_iterations):
     discriminator.zero_grad()
     x = next(iter(patch_loader))
     x = x.to(device)
-    z = generator.random_latent_tensor(batch_size, latent_image_dims, latent_image_dims, device)
+    z = generator.random_latent_tensor(batch_size, patch_size, patch_size, device)
     x_pred = discriminator(x)
     z_pred = discriminator(generator(z))
     discriminator_optimizer.zero_grad()
@@ -77,7 +61,7 @@ for i in range(train_iterations):
 
     # Step generator
     generator.zero_grad()
-    z = generator.random_latent_tensor(batch_size, latent_image_dims, latent_image_dims, device)
+    z = generator.random_latent_tensor(batch_size, patch_size, patch_size, device)
     z_pred = discriminator(generator(z))
     generator_optimizer.zero_grad()
     generator_loss = loss_fn(z_pred, torch.ones_like(z_pred))
@@ -88,8 +72,7 @@ for i in range(train_iterations):
     print(f"[{i+1:>6d}/{train_iterations:>6d}][{100*(i+1)/train_iterations:04.1f}%]")
 
     if (i+1) % save_frequency == 0:
-        torch.save(generator.state_dict(), '.' + generator_weights_fname + f".{i+1:>06d}")
-        torch.save(discriminator.state_dict(),  '.' + discriminator_weights_fname + f".{i+1:>06d}")
-
-torch.save(generator.state_dict(), generator_weights_fname)
-torch.save(discriminator.state_dict(), discriminator_weights_fname)
+        generator_script = torch.jit.script(generator)
+        discriminator_script = torch.jit.script(discriminator)
+        torch.jit.save(generator_script, f"generator-{i+1:>06d}_iterations.pth")
+        torch.jit.save(discriminator_script, f"discriminator-{i+1:>06d}_iterations.pth")

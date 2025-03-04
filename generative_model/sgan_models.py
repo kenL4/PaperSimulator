@@ -22,7 +22,12 @@ class SGAN4_Generator(torch.nn.Module):
     def forward(self, x):
         return self.net(x)
 
-    def random_latent_tensor(self, batch_size, latent_w, latent_h, device=None):
+    @torch.jit.export
+    def random_latent_tensor(
+            self, batch_size: int, width: int, height: int,
+            device: torch.device = torch.device("cpu")):
+        latent_w = (width+15) // 16
+        latent_h = (height+15) // 16
         return 2.0 * torch.rand((batch_size, 20, latent_h, latent_w), device=device) - 1.0
 
 

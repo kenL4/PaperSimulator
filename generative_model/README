@@ -63,6 +63,8 @@ examples/*-train.*
   Some example images I trained a model on.
 examples/*-*_iterations.png
   Some example images I generated with a model.
+models/*.plt
+  Trained models.
 
 
 
