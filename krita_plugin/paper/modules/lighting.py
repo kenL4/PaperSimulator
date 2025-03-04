@@ -1,10 +1,7 @@
 from krita import *
-import struct
 import math
 import numpy as np
 import time
-import pyvista as pv
-import sys
 # sys.path.append("mesh_utils")
 # import get_mesh_data
 # import pointCloudGen
