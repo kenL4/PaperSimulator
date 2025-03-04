@@ -2,7 +2,8 @@ from krita import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
-#from .lighting import *
+from .lighting import *
+import math
 
 class Angle(QWidget):
     def __init__(self):
@@ -103,9 +104,20 @@ class LightDocker(DockWidget):
         mainWidget.layout().addWidget(self.intensity)
         mainWidget.layout().addWidget(button)
 
+        self.shading = Shading()
+
     def click(self):
-        # Placeholder function for Will and Jonathan.
-        pass
+        direction = np.array([0, 0, 0.2])
+        angle_radians = self.angle.slider.value() / 180 * math.pi
+        direction[0] = math.cos(angle_radians)
+        direction[1] = math.sin(angle_radians)
+        direction *= self.intensity.slider.value() / 50
+
+        if (self.shading.normal_map.shape[0] == 0):
+            app = Krita.instance()
+            doc = app.activeDocument()
+            self.shading.set_normal_map(gen_funny_normal_map(doc.width(), doc.height()))
+        self.shading.update_shading(direction)
 
     def canvasChanged(self, canvas):
         pass

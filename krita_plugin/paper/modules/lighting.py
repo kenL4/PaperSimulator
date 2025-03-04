@@ -5,31 +5,31 @@ import numpy as np
 import time
 import pyvista as pv
 import sys
-sys.path.append("mesh_utils")
-import get_mesh_data
-import pointCloudGen
+# sys.path.append("mesh_utils")
+# import get_mesh_data
+# import pointCloudGen
 
 
-def get_normal_map_from_heightmap(heightmap_np):
-    (height,width) = heightmap_np.shape()
-    mesh = pointCloudGen.heightmap_to_mesh()
-    mesh = mesh.compute_normals(cell_normals = False, point_normals = True)
-    normals = mesh['Normals'].tolist()
-    normalMap = [normals[width*i:width*(i+1)] for i in range(height)]
-    return (height,width,normalMap)
+# def get_normal_map_from_heightmap(heightmap_np):
+#     (height,width) = heightmap_np.shape()
+#     mesh = pointCloudGen.heightmap_to_mesh()
+#     mesh = mesh.compute_normals(cell_normals = False, point_normals = True)
+#     normals = mesh['Normals'].tolist()
+#     normalMap = [normals[width*i:width*(i+1)] for i in range(height)]
+#     return (height,width,normalMap)
 
 
     
 
-def get_normal_map_from_obj_file(objFile,origHeight,origWidth):
-    #For prototype1 height and width is 1623x1125
-    meshNormals = get_mesh_data.get_mesh_with_surface_normals(objFile)
-    normals = meshNormals['Normals'].tolist()
+# def get_normal_map_from_obj_file(objFile,origHeight,origWidth):
+#     #For prototype1 height and width is 1623x1125
+#     meshNormals = get_mesh_data.get_mesh_with_surface_normals(objFile)
+#     normals = meshNormals['Normals'].tolist()
 
-    #Map to 3D array
-    normalMap = [normals[origWidth*i:origWidth*(i+1)] for i in range(origHeight)]
+#     #Map to 3D array
+#     normalMap = [normals[origWidth*i:origWidth*(i+1)] for i in range(origHeight)]
 
-    return (origHeight,origWidth,normalMap)
+#     return (origHeight,origWidth,normalMap)
 
 SHADOW_LAYER_NAME = "shadow"
 
@@ -75,7 +75,7 @@ def gen_funny_normal_map(width, height): #for testing only
 
 class Shading:
     def __init__(self):
-        self.normal_map = None
+        self.normal_map = np.array([])
 
     def set_normal_map(self, normal_map):
         self.normal_map = normal_map
