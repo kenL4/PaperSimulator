@@ -5,13 +5,9 @@ from .texture import overlay_canvas
 from .apply_texture import apply_texture
 import os
 
-class PaperDocker(DockWidget):
+class Paper():
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Paper")
-
-        mainWidget = QWidget(self)
-        self.setWidget(mainWidget)
 
         self.uniqueId = None
 
@@ -20,15 +16,8 @@ class PaperDocker(DockWidget):
         papers.setIconSize(QSize(64, 64))
         papers.setResizeMode(QListWidget.Adjust)
         papers.itemClicked.connect(self.click)
-        
-        button = QPushButton("Generate New Paper", mainWidget)
-        button.clicked.connect(self.click2)
 
         self.load(papers)
-
-        mainWidget.setLayout(QVBoxLayout())
-        mainWidget.layout().addWidget(papers)
-        mainWidget.layout().addWidget(button)
 
     def load(self, papers):
         assets = os.path.join(os.path.dirname(__file__), "../", "assets")
@@ -54,11 +43,28 @@ class PaperDocker(DockWidget):
         self.uniqueId = overlay_canvas(file, self.uniqueId)
         apply_texture(path, file)
 
-    def click2(self):
+class PaperDocker(DockWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Paper")
+
+        mainWidget = QWidget(self)
+        self.setWidget(mainWidget)
+    
+        papers = Paper()
+        
+        button = QPushButton("Generate New Paper", mainWidget)
+        button.clicked.connect(self.click)
+
+        mainWidget.setLayout(QVBoxLayout())
+        mainWidget.layout().addWidget(papers)
+        mainWidget.layout().addWidget(button)
+
+    def click(self):
         doc = Krita.instance().activeDocument()
         
         # Placeholder function for Elaine to implement.
-        
+
         #generate(doc.width(), doc.height())
 
     def canvasChanged(self, canvas):
