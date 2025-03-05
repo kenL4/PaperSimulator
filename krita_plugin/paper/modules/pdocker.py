@@ -5,21 +5,24 @@ from .texture import overlay_canvas
 from .apply_texture import apply_texture
 import os
 
-class Paper():
+class Paper(QWidget):
     def __init__(self):
         super().__init__()
 
         self.uniqueId = None
 
-        papers = QListWidget()
-        papers.setViewMode(QListWidget.IconMode)
-        papers.setIconSize(QSize(64, 64))
-        papers.setResizeMode(QListWidget.Adjust)
-        papers.itemClicked.connect(self.click)
+        self.paper = QListWidget()
+        self.paper.setViewMode(QListWidget.IconMode)
+        self.paper.setIconSize(QSize(64, 64))
+        self.paper.setResizeMode(QListWidget.Adjust)
+        self.paper.itemClicked.connect(self.click)
 
-        self.load(papers)
+        self.load()
 
-    def load(self, papers):
+        self.setLayout(QVBoxLayout())
+        self.layout().addWidget(self.paper)
+
+    def load(self):
         assets = os.path.join(os.path.dirname(__file__), "../", "assets")
 
         for file in os.listdir(assets):
@@ -33,7 +36,7 @@ class Paper():
             item.setData(33, file)
             item.setToolTip(file)
 
-            papers.addItem(item)
+            self.paper.addItem(item)
 
     def click(self, item):
         path = item.data(32)
@@ -51,13 +54,14 @@ class PaperDocker(DockWidget):
         mainWidget = QWidget(self)
         self.setWidget(mainWidget)
     
-        papers = Paper()
+        paper = Paper()
         
         button = QPushButton("Generate New Paper", mainWidget)
+        button.setToolTip("Generates the same paper model selected in your current doc size.")
         button.clicked.connect(self.click)
 
         mainWidget.setLayout(QVBoxLayout())
-        mainWidget.layout().addWidget(papers)
+        mainWidget.layout().addWidget(paper)
         mainWidget.layout().addWidget(button)
 
     def click(self):
