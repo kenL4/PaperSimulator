@@ -1,35 +1,59 @@
-from krita import *
+#from krita import *
 import math
 import numpy as np
 import time
+from PIL import Image
+import pyvista as pv
 # sys.path.append("mesh_utils")
 # import get_mesh_data
 # import pointCloudGen
 
+normal_constant_idk = 1
 
-# def get_normal_map_from_heightmap(heightmap_np):
-#     (height,width) = heightmap_np.shape()
-#     mesh = pointCloudGen.heightmap_to_mesh()
-#     mesh = mesh.compute_normals(cell_normals = False, point_normals = True)
-#     normals = mesh['Normals'].tolist()
-#     normalMap = [normals[width*i:width*(i+1)] for i in range(height)]
-#     return (height,width,normalMap)
+def heightmap_to_mesh(heightmap_np, true_width, true_height, true_depth):
+    xs, ys = np.meshgrid(
+      np.linspace(0, true_width, heightmap_np.shape[1]),
+      np.linspace(0, true_height, heightmap_np.shape[0]),
+    )
+    grid = pv.StructuredGrid(xs, ys, heightmap_np * true_depth)
+    mesh = grid.extract_surface()
+    return mesh
 
+def get_normal_map_from_heightmap(heightmap_np):
+    height,width = heightmap_np.shape
+    mesh = heightmap_to_mesh(heightmap_np, width, height, normal_constant_idk)
+    mesh = mesh.compute_normals(cell_normals = False, point_normals = True)
+    normals = mesh['Normals'].tolist()
+    normalMap = [normals[width*i:width*(i+1)] for i in range(height)]
+    normalMap = np.array(normals)
+    normalMap = np.reshape(normalMap, (height, width, 3))
+    dir = np.take(normalMap, [2], axis=2)
+    dir = dir / np.abs(dir)
+    normalMap *= dir
 
-    
+    magnitude = np.linalg.norm(normalMap, axis=-1, keepdims=True)
+    normalMap = normalMap / magnitude
 
-# def get_normal_map_from_obj_file(objFile,origHeight,origWidth):
-#     #For prototype1 height and width is 1623x1125
-#     meshNormals = get_mesh_data.get_mesh_with_surface_normals(objFile)
-#     normals = meshNormals['Normals'].tolist()
+    return normalMap
 
-#     #Map to 3D array
-#     normalMap = [normals[origWidth*i:origWidth*(i+1)] for i in range(origHeight)]
+def get_normal_map(image_path):
+    image = Image.open(image_path)
+    width, height = image.size
 
-#     return (origHeight,origWidth,normalMap)
+    result = np.array(image) / 255
+    app = Krita.instance()
+    doc = app.activeDocument()
+    while width < doc.width() or height < doc.height():
+        result = reflect_pattern(result)
+        width *= 2
+        height *= 2
+
+    np.resize(result, (height, width))
+
+    result = get_normal_map_from_heightmap(result)
+    return result
 
 SHADOW_LAYER_NAME = "shadow"
-
 
 def reflect_pattern(top_left):
     #takes numpy array and reflects it to create a pattern tile that is 4 times the size of the regular array
@@ -132,9 +156,21 @@ class Shading:
         #doc.rootNode().addChildNode(shadow_node, None)
         doc.refreshProjection()
 
+    def update(self, incidence_angle, angle, intensity):
+        direction = np.array([0, 0, 0])
+        angle_radians = angle / 180 * math.pi
+        direction[0] = math.cos(angle_radians)
+        direction[1] = math.sin(angle_radians)
+        incidence_angle = incidence_angle / 180 * math.pi
+        direction[2] = math.sin(incidence_angle)
+        direction *= (self.intensity.slider.value() / 15)
+
+        self.update_shading(direction)
+
 if __name__ == "__main__":
+    print(get_normal_map("catshockpaper.png"))
     app = Krita.instance()
     doc = app.activeDocument()
     shading = Shading()
-    shading.set_normal_map(gen_funny_normal_map(doc.width(), doc.height()))
+    shading.set_normal_map(get_normal_map("catshockpaper.png"))
     shading.update_shading(np.array([1, 1, 0.7]))
