@@ -163,7 +163,7 @@ class Shading:
         direction[1] = math.sin(angle_radians)
         incidence_angle = incidence_angle / 180 * math.pi
         direction[2] = math.sin(incidence_angle)
-        direction *= (self.intensity.slider.value() / 15)
+        direction *= (intensity / 15)
 
         self.update_shading(direction)
 
