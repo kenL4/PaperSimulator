@@ -24,7 +24,6 @@ def get_normal_map_from_heightmap(heightmap_np):
     mesh = heightmap_to_mesh(heightmap_np, width, height, normal_constant_idk)
     mesh = mesh.compute_normals(cell_normals = False, point_normals = True)
     normals = mesh['Normals'].tolist()
-    normalMap = [normals[width*i:width*(i+1)] for i in range(height)]
     normalMap = np.array(normals)
     normalMap = np.reshape(normalMap, (height, width, 3))
     dir = np.take(normalMap, [2], axis=2)
@@ -157,7 +156,7 @@ class Shading:
         doc.refreshProjection()
 
     def update(self, incidence_angle, angle, intensity):
-        direction = np.array([0, 0, 0])
+        direction = np.array([0.0, 0.0, 0.0])
         angle_radians = angle / 180 * math.pi
         direction[0] = math.cos(angle_radians)
         direction[1] = math.sin(angle_radians)
