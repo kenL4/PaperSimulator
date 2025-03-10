@@ -2,6 +2,7 @@ from krita import *
 
 def overlay_canvas(texture_pattern, id):
     doc = Krita.instance().activeDocument()
+    original_selection = doc.activeNode()
     root = doc.rootNode()
 
     i = InfoObject()
@@ -25,6 +26,7 @@ def overlay_canvas(texture_pattern, id):
     if not flag:
         root.addChildNode(fill_layer, root.childNodes()[0])
 
+    doc.setActiveNode(original_selection)
     doc.refreshProjection()
     return fill_layer.uniqueId()
 

@@ -3,20 +3,30 @@ import shutil
 import os
 import xml.etree.ElementTree as ET 
 import hashlib
+from PyQt5.QtGui import QImage
+from .contrast import qimage_contrast_adjust
 
 def make_texture(texture_path, pattern_name):
     path = Krita.instance().readSetting("", "ResourceDirectory", None)
     path = os.path.join(path, "patterns")
-    pattern_file_path = path + "/" + pattern_name
+    file_path = path + "/" + pattern_name
     
     # Just overwrite, for now
+    shutil.copyfile(texture_path, file_path)
+
+    # Load copied file
+    pattern_file_path = path + "/pattern_" + pattern_name
     shutil.copyfile(texture_path, pattern_file_path)
-    print(pattern_file_path)
+    img = QImage(pattern_file_path)
+    if img:
+        contrast_adjusted_img = qimage_contrast_adjust(img)
+        contrast_adjusted_img.save(pattern_file_path)
     return pattern_file_path
 
-def apply_texture(texture_path, PATTERN_NAME):
+def apply_texture(texture_path, pattern_name):
     # Ensure pattern exists
-    path = make_texture(texture_path, PATTERN_NAME)
+    path = make_texture(texture_path, pattern_name)
+    PATTERN_NAME = "pattern_" + pattern_name
     # Krita.instance().resourcesChanged()
     
     # Apply paper file as pattern
@@ -24,8 +34,9 @@ def apply_texture(texture_path, PATTERN_NAME):
     pattern = None
     for name, res in patterns_manager.items():
         if name == PATTERN_NAME:
-            print("Pattern file found!")
             pattern = res
+
+    print(PATTERN_NAME)
     
     view = Krita.instance().activeWindow().activeView()
     if view and pattern:
@@ -51,7 +62,7 @@ def apply_texture(texture_path, PATTERN_NAME):
             #         param.text = hashlib.md5(f.read()).digest()
             if param is not None and param.attrib["name"] == "Texture/Pattern/PatternMD5Sum":
                 md5sumed = True
-                with open(texture_path, "rb") as f:
+                with open(path, "rb") as f:
                     param.text = hashlib.md5(f.read()).hexdigest()
                 
         if not enabled:
@@ -72,7 +83,7 @@ def apply_texture(texture_path, PATTERN_NAME):
         
         if not md5sumed:
             pattern_param = ET.Element("param", type="string", name="Texture/Pattern/PatternMD5Sum")
-            with open(texture_path, "rb") as f:
+            with open(path, "rb") as f:
                 pattern_param.text = hashlib.md5(f.read()).hexdigest()
             root.append(pattern_param)
         
