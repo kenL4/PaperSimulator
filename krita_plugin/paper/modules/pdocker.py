@@ -24,6 +24,7 @@ class Paper(QWidget):
         self.layout().addWidget(self.paper)
 
     def load(self):
+        self.paper.clear()
         assets = os.path.join(os.path.dirname(__file__), "../", "assets")
 
         for file in os.listdir(assets):
