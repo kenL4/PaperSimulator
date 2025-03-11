@@ -195,7 +195,7 @@ class LightDocker(DockWidget):
         direction[1] = math.sin(angle_radians)
         direction *= self.intensity.slider.value() / 15
 
-        if (self.shading.normal_map.shape[0] == 0):
+        if (shading.normal_map.shape[0] == 0):
             app = Krita.instance()
             doc = app.activeDocument()
             shading.set_normal_map(gen_funny_normal_map(doc.width(), doc.height()))

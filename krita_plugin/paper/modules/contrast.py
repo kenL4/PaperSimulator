@@ -1,6 +1,7 @@
 import numpy as np
 from PyQt5.QtGui import QImage
 import os
+import cv2
 
 def qimage_to_np(img):
     img = img.convertToFormat(QImage.Format.Format_RGB888)
@@ -21,21 +22,46 @@ def contrast_stretch(img):
     min_brightness = np.min(img, axis=(0, 1), keepdims=True)
     max_brightness = np.max(img, axis=(0, 1), keepdims=True)
     contrast = max_brightness - min_brightness
+    contrast = np.where(contrast == 0, 1, contrast)
+
     normalized_img = (img - min_brightness) / (contrast) * 255
-    return np.clip(normalized_img, 0, 255).astype(np.uint8)
+    new_img = np.clip(normalized_img, 0, 255).astype(np.uint8)
+
+    sobelx = cv2.Sobel(new_img, cv2.CV_64F, 1, 0, ksize=3)
+    sobely = cv2.Sobel(new_img, cv2.CV_64F, 0, 1, ksize=3)
+    sobel = np.hypot(sobelx, sobely)
+    sobel = sobel / sobel.max() * 255 # Normalize the edges
+    sobel = sobel.astype(np.uint8)
+
+    darkened = cv2.subtract(new_img, sobel)
+    darkened = new_img
+    return darkened
+
+def quantize_img(img, colour_bits=1):
+    # Make it black or white
+    img = (img * (2**(colour_bits))) // (2**(colour_bits))
+    return img
 
 def qimage_contrast_adjust(qimg):
     np_img = qimage_to_np(qimg)
-    contrast_enhanced = contrast_stretch(np_img)
+    gray_np = np.dot(np_img[..., :3], [0.2989, 0.5870, 0.1140])
+    gray_rgb_np = np.stack([gray_np]*3, axis=-1).astype(np.uint8)
+    contrast_enhanced = contrast_stretch(gray_rgb_np)
+    contrast_enhanced = np.where(contrast_enhanced < np.mean(contrast_enhanced, axis=(0,1)), 0, contrast_enhanced) # Hard boundary make look good
     return np_to_qimage(contrast_enhanced)
 
 def test_contrast():
     # Avoid importing unnecessarily
     from PIL import Image
 
-    path = os.path.join(os.getcwd(), 'test_assets/test_woods.jpg')
-    img = Image.open(path)
-    img.show()
-    contrast_np = contrast_stretch(np.asarray(img))
+    path = os.path.join(os.getcwd(), 'krita_plugin/paper/assets/test1.png')
+    img = Image.open(path).convert("RGB")
+    gray_np = np.dot(np.asarray(img)[..., :3], [0.2989, 0.5870, 0.1140])
+    gray_rgb_np = np.stack([gray_np]*3, axis=-1).astype(np.uint8)
+    Image.fromarray(gray_rgb_np).show()
+    contrast_np = contrast_stretch(gray_rgb_np)
     contrast_img = Image.fromarray(contrast_np)
     contrast_img.show()
+
+if __name__ == "__main__":
+    test_contrast()
