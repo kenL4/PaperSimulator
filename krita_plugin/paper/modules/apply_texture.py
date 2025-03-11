@@ -17,7 +17,7 @@ def make_texture(texture_path, pattern_name):
     # Load copied file
     pattern_file_path = path + "/pattern_" + pattern_name
     shutil.copyfile(texture_path, pattern_file_path)
-    img = QImage(pattern_file_path)
+    img = QImage(pattern_file_path).convertToFormat(QImage.Format.Format_RGB888)
     if img:
         contrast_adjusted_img = qimage_contrast_adjust(img)
         contrast_adjusted_img.save(pattern_file_path)

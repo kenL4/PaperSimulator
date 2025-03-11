@@ -4,7 +4,7 @@ from PyQt5.QtGui import *
 from .texture import *
 from .apply_texture import apply_texture
 import os
-from generative_model.generate import generate_texture
+from .generative_model.generate import generate_texture
 
 class Paper(QWidget):
     def __init__(self):
@@ -62,7 +62,7 @@ class PaperDocker(DockWidget):
         button.clicked.connect(self.click)
 
         mainWidget.setLayout(QVBoxLayout())
-        mainWidget.layout().addWidget(paper)
+        mainWidget.layout().addWidget(self.paper)
         mainWidget.layout().addWidget(button)
 
     def click(self):

@@ -47,7 +47,8 @@ def qimage_contrast_adjust(qimg):
     gray_np = np.dot(np_img[..., :3], [0.2989, 0.5870, 0.1140])
     gray_rgb_np = np.stack([gray_np]*3, axis=-1).astype(np.uint8)
     contrast_enhanced = contrast_stretch(gray_rgb_np)
-    contrast_enhanced = np.where(contrast_enhanced < np.mean(contrast_enhanced, axis=(0,1)), 0, contrast_enhanced) # Hard boundary make look good
+    mean = np.mean(contrast_enhanced, axis=(0,1))
+    contrast_enhanced = np.where(contrast_enhanced < mean, 0, contrast_enhanced) # Hard boundary make look good
     return np_to_qimage(contrast_enhanced)
 
 def test_contrast():
@@ -60,6 +61,8 @@ def test_contrast():
     gray_rgb_np = np.stack([gray_np]*3, axis=-1).astype(np.uint8)
     Image.fromarray(gray_rgb_np).show()
     contrast_np = contrast_stretch(gray_rgb_np)
+    mean = np.mean(contrast_np, axis=(0,1))
+    contrast_np = np.where(contrast_np < mean, 0, contrast_np)
     contrast_img = Image.fromarray(contrast_np)
     contrast_img.show()
 
