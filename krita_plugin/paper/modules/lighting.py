@@ -40,6 +40,8 @@ def generate_normal_map_from_image(image_path):
     width, height = image.size
 
     result = np.array(image) / 255
+    if (len(result.shape) == 3):
+        result = np.mean(result, axis=2)
 
     result = get_normal_map_from_heightmap(result)
     
