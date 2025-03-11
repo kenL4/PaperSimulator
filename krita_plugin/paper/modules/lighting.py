@@ -35,22 +35,62 @@ def get_normal_map_from_heightmap(heightmap_np):
 
     return normalMap
 
-def get_normal_map(image_path):
+def generate_normal_map_from_image(image_path):
     image = Image.open(image_path)
     width, height = image.size
 
     result = np.array(image) / 255
+
+    result = get_normal_map_from_heightmap(result)
+    
     app = Krita.instance()
     doc = app.activeDocument()
     while width < doc.width() or height < doc.height():
-        result = reflect_pattern(result)
+        result = reflect_vector_pattern(result)
+        width *= 2
+        height *= 2
+    return result
+
+def normal_map_to_image(normal_map, path):
+    width, height, three = normal_map.shape
+    result = normal_map
+    result.resize(width, height, 3)
+    result *= 128
+    result += np.ones(shape=(width, height, 3)) * 128
+    result = result.astype("uint8")
+    img = Image.fromarray(result, "RGB")
+    img.save(path)
+
+def get_normal_map_from_image(path):
+    image = Image.open(path)
+    width, height = image.size
+    result = np.array(image).astype("float64")
+    result.resize(width, height, 3)
+    result -= np.ones(shape=(width, height, 3)) * 128
+    result = result / 128
+
+    app = Krita.instance()
+    doc = app.activeDocument()
+    while width < doc.width() or height < doc.height():
+        result = reflect_vector_pattern(result)
         width *= 2
         height *= 2
 
-    np.resize(result, (height, width))
+    np.resize(result, (width, height))
 
-    result = get_normal_map_from_heightmap(result)
     return result
+
+def reflect_vector_pattern(top_left):
+    #takes numpy array and reflects it to create a pattern tile that is 4 times the size of the regular array
+    top_right = np.fliplr(top_left) * np.array([1, -1, 1])
+    bottom_left = np.flipud(top_left) * np.array([-1, 1, 1])
+    bottom_right = np.fliplr(bottom_left) * np.array([1, -1, 1])
+
+    top = np.append(top_left, top_right, 1)
+    bottom = np.append(bottom_left, bottom_right, 1)
+    new_arr = np.append(top, bottom, 0)
+
+    return new_arr
 
 SHADOW_LAYER_NAME = "shadow"
 

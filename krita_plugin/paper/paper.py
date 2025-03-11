@@ -13,6 +13,5 @@ for root, dirs, files in os.walk(assets_folder):
         shutil.copyfile(assets_folder + "/" + file, pattern_path + "/" + file)
         shutil.copyfile(assets_folder + "/" + file, pattern_path + "/pattern_" + file)
 
-
 Krita.instance().addDockWidgetFactory(DockWidgetFactory("pDocker", DockWidgetFactoryBase.DockRight, PaperDocker))
 Krita.instance().addDockWidgetFactory(DockWidgetFactory("lDocker", DockWidgetFactoryBase.DockRight, LightDocker))

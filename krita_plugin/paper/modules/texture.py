@@ -30,9 +30,9 @@ def overlay_canvas(texture_pattern, id):
     doc.refreshProjection()
     return fill_layer.uniqueId()
 
-
 def overlay_canvas_file(file_path):
     doc = Krita.instance().activeDocument()
+    original_selection = doc.activeNode()
     root = doc.rootNode()
 
     file_layer = doc.createFileLayer("Paper Texture", file_path, "ToImagePPI")
@@ -40,4 +40,5 @@ def overlay_canvas_file(file_path):
     file_layer.setVisible(True)
     file_layer.setLocked(True)
 
+    doc.setActiveNode(original_selection)
     doc.refreshProjection()
