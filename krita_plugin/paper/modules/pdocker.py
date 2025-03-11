@@ -4,7 +4,7 @@ from PyQt5.QtGui import *
 from .texture import overlay_canvas
 from .apply_texture import apply_texture
 import os
-from PaperSimulator.generative_model.generate import generate_texture
+#from PaperSimulator.generative_model.generate import generate_texture
 
 class Paper(QWidget):
     def __init__(self):
@@ -58,7 +58,7 @@ class PaperDocker(DockWidget):
         paper = Paper()
         
         button = QPushButton("Generate New Paper", mainWidget)
-        button.setToolTip("Generates the same paper model selected in your current doc size.")
+        button.setToolTip("Generates the selected paper model in your current doc size.")
         button.clicked.connect(self.click)
 
         mainWidget.setLayout(QVBoxLayout())
@@ -72,11 +72,10 @@ class PaperDocker(DockWidget):
 
         #generate(doc.width(), doc.height())
 
-        model_path = os.path.join(os.path.dirname(__file__), "../models/paper_foundation-generator-010000_iterations.pth")
+        """model_path = os.path.join(os.path.dirname(__file__), "../models/paper_foundation-generator-010000_iterations.pth")
         im = generate_texture(model_path, doc.width(), doc.height())
         assets_path = os.path.join(os.path.dirname(__file__), "../assets")
-        im.save(f"{assets_path}/new.jpg")
-
+        im.save(f"{assets_path}/new.jpg")"""
 
     def canvasChanged(self, canvas):
         pass

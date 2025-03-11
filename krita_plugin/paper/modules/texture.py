@@ -30,7 +30,6 @@ def overlay_canvas(texture_pattern, id):
     doc.refreshProjection()
     return fill_layer.uniqueId()
 
-
 def overlay_canvas_file(file_path):
     doc = Krita.instance().activeDocument()
     root = doc.rootNode()

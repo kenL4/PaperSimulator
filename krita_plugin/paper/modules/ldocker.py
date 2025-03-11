@@ -5,26 +5,23 @@ from PyQt5.QtCore import *
 from .lighting import *
 import math
 
-class Angle(QWidget):
+class Incidence(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.pixmap = QPixmap(100, 100)
-        self.pixmap.fill(Qt.transparent)
-
-        self.draw()
-
         self.label = QLabel()
-        self.label.setPixmap(self.pixmap)
+        self.draw(0)
 
         self.slider = QSlider(Qt.Horizontal)
-        self.slider.setRange(0, 360)
+        self.slider.setRange(0, 90)
+        self.slider.setToolTip("Select the light incidence angle.")
         self.slider.valueChanged.connect(self.sync)
 
         self.spinBox = QDoubleSpinBox()
-        self.spinBox.setRange(0, 360)
+        self.spinBox.setRange(0, 90)
         self.spinBox.setSingleStep(0.1)
         self.spinBox.setSuffix("°")
+        self.spinBox.setToolTip("Select the light incidence angle.")
         self.spinBox.valueChanged.connect(self.sync)
 
         layout = QHBoxLayout()
@@ -35,19 +32,101 @@ class Angle(QWidget):
         self.layout().addWidget(self.label, alignment=Qt.AlignCenter)
         self.layout().addLayout(layout)
 
-    def draw(self):
-        painter = QPainter(self.pixmap)        
-        painter.setPen(Qt.black)
-        painter.drawEllipse(10, 10, 80, 80)
-        painter.drawLine(50, 50, 90, 50)
+    def draw(self, value):
+        pen = QPen(Qt.white, 1, Qt.DotLine)
+        x, y = 35 + 30*math.cos(math.radians(value + 180)), 35 + 30*math.sin(math.radians(value + 180))
+
+        pixmap = QPixmap(70, 40)
+        pixmap.fill(Qt.transparent)
+
+        painter = QPainter(pixmap)
+        painter.setPen(Qt.transparent)
+        painter.setBrush(QColor(56, 56, 56))
+        painter.drawPie(QRect(5, 5, 60, 60), 0, 2880)
+        
+        painter.setPen(Qt.white)
+        painter.drawLine(5, 35, 65, 35)
+        painter.drawLine(QLineF(35, 35, x, y))
+
+        painter.setBrush(Qt.white)  
+        painter.drawEllipse(33, 33, 4, 4)
+        painter.drawEllipse(QPointF(x, y), 2, 2)
+        
+        painter.setPen(pen)
+        painter.setBrush(Qt.transparent)  
+        painter.drawArc(QRect(20, 20, 30, 30), 0, 2880)
+        painter.drawLine(35, 5, 35, 35)
+
         painter.end()
+
+        self.label.setPixmap(pixmap)
 
     def sync(self, value):
         self.slider.setValue(int(value))
         self.spinBox.setValue(value)
 
-        pixmap = self.pixmap.transformed(QTransform().rotate(-value))
+        self.draw(value)
+
+class Direction(QWidget):
+    def __init__(self):
+        super().__init__()
+
+        self.label = QLabel()
+        self.draw(0)
+
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setRange(0, 360)
+        self.slider.setToolTip("Select the light direction.")
+        self.slider.valueChanged.connect(self.sync)
+
+        self.spinBox = QDoubleSpinBox()
+        self.spinBox.setRange(0, 360)
+        self.spinBox.setSingleStep(0.1)
+        self.spinBox.setSuffix("°")
+        self.spinBox.setToolTip("Select the light direction.")
+        self.spinBox.valueChanged.connect(self.sync)
+
+        layout = QHBoxLayout()
+        layout.addWidget(self.slider)
+        layout.addWidget(self.spinBox)
+
+        self.setLayout(QVBoxLayout())
+        self.layout().addWidget(self.label, alignment=Qt.AlignCenter)
+        self.layout().addLayout(layout)
+
+    def draw(self, value):
+        pixmap = QPixmap(70, 70)
+        pixmap.fill(Qt.transparent)
+
+        pen = QPen(Qt.white, 1, Qt.DotLine)
+        x, y = 35 + 30*math.cos(math.radians(value)), 35 + 30*math.sin(math.radians(value))
+
+        painter = QPainter(pixmap)
+        
+        painter.setPen(Qt.white)
+        painter.setBrush(QColor(56, 56, 56)) 
+        painter.drawEllipse(5, 5, 60, 60)
+        painter.drawLine(QLineF(35, 35, x, y))
+               
+        painter.setBrush(Qt.white)
+        painter.drawEllipse(33, 33, 4, 4)  
+        painter.drawEllipse(QPointF(x, y), 2, 2)
+
+        painter.setPen(pen)
+        painter.setBrush(Qt.transparent)  
+        painter.drawEllipse(20, 20, 30, 30)
+        painter.drawLine(35, 5, 35, 65)
+        painter.drawLine(5, 35, 65, 35)
+
+        painter.end()
+
         self.label.setPixmap(pixmap)
+
+    def sync(self, value):
+        self.slider.setValue(int(value))
+        self.spinBox.setValue(value)
+
+        self.draw(value)
 
 class Intensity(QWidget):
     def __init__(self):
@@ -61,12 +140,14 @@ class Intensity(QWidget):
         self.slider.setRange(0, 100)
         self.slider.setTickPosition(QSlider.TicksBelow)
         self.slider.setTickInterval(10)
+        self.slider.setToolTip("Select the light intensity.")
         self.slider.valueChanged.connect(self.sync)
 
         self.spinBox = QDoubleSpinBox()
         self.spinBox.setRange(0, 100)
         self.spinBox.setSingleStep(0.1)
         self.spinBox.setSuffix("%")
+        self.spinBox.setToolTip("Select the light intensity.")
         self.spinBox.valueChanged.connect(self.sync)
 
         layout = QHBoxLayout()
@@ -93,22 +174,23 @@ class LightDocker(DockWidget):
         mainWidget = QWidget(self)
         self.setWidget(mainWidget)
 
-        self.angle = Angle()
+        self.incidence = Incidence()
+        self.direction = Direction()
         self.intensity = Intensity()
 
         button = QPushButton("Apply", mainWidget)
         button.clicked.connect(self.click)
 
         mainWidget.setLayout(QVBoxLayout())
-        mainWidget.layout().addWidget(self.angle)
+        mainWidget.layout().addWidget(self.incidence)
+        mainWidget.layout().addWidget(self.direction)
         mainWidget.layout().addWidget(self.intensity)
         mainWidget.layout().addWidget(button)
 
-        self.shading = Shading()
-
     def click(self):
+        shading = Shading()
         direction = np.array([0, 0, 0.2])
-        angle_radians = self.angle.slider.value() / 180 * math.pi
+        angle_radians = self.direction.slider.value() / 180 * math.pi
         direction[0] = math.cos(angle_radians)
         direction[1] = math.sin(angle_radians)
         direction *= self.intensity.slider.value() / 15
@@ -116,8 +198,8 @@ class LightDocker(DockWidget):
         if (self.shading.normal_map.shape[0] == 0):
             app = Krita.instance()
             doc = app.activeDocument()
-            self.shading.set_normal_map(gen_funny_normal_map(doc.width(), doc.height()))
-        self.shading.update_shading(direction)
+            shading.set_normal_map(gen_funny_normal_map(doc.width(), doc.height()))
+        shading.update_shading(direction)
 
     def canvasChanged(self, canvas):
         pass
