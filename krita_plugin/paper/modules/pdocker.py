@@ -1,10 +1,10 @@
 from krita import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
-from .texture import overlay_canvas
+from .texture import *
 from .apply_texture import apply_texture
 import os
-#from PaperSimulator.generative_model.generate import generate_texture
+from generative_model.generate import generate_texture
 
 class Paper(QWidget):
     def __init__(self):
@@ -55,7 +55,7 @@ class PaperDocker(DockWidget):
         mainWidget = QWidget(self)
         self.setWidget(mainWidget)
     
-        paper = Paper()
+        self.paper = Paper()
         
         button = QPushButton("Generate New Paper", mainWidget)
         button.setToolTip("Generates the selected paper model in your current doc size.")
@@ -67,15 +67,17 @@ class PaperDocker(DockWidget):
 
     def click(self):
         doc = Krita.instance().activeDocument()
-        
-        # Placeholder function for Elaine to implement.
 
-        #generate(doc.width(), doc.height())
-
-        """model_path = os.path.join(os.path.dirname(__file__), "../models/paper_foundation-generator-010000_iterations.pth")
+        model_path = os.path.join(os.path.dirname(__file__), "generative_model/models/paper_foundation-generator-010000_iterations.pth")
         im = generate_texture(model_path, doc.width(), doc.height())
-        assets_path = os.path.join(os.path.dirname(__file__), "../assets")
-        im.save(f"{assets_path}/new.jpg")"""
+        assets = os.path.join(os.path.dirname(__file__), "../assets")
+        file = f"new.png"
+        path = os.path.join(assets, file)
+        im.save(path)
+
+        self.paper.load()
+
+        overlay_canvas_file(path)
 
     def canvasChanged(self, canvas):
         pass
