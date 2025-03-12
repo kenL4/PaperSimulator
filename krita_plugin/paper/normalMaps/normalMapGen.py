@@ -45,7 +45,7 @@ def get_normal_map(image_path):
     result = get_normal_map_from_heightmap(heightmap,height,width)
     return result
 
-imagesToConvert = ["papertest.jpg","test1.png","test2.png","test3.webp","test4.png","test5.png"]
+imagesToConvert = ["crumpled_3200x3200.png", "paper_foundation1_3200x3200.png", "paper_foundation2_1000x1000_gen1.png", "paper_foundating2_1920x1080.png"]
 
 
 for fileName in imagesToConvert:
