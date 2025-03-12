@@ -37,33 +37,28 @@ def get_normal_map_from_heightmap(heightmap_np):
 
 def generate_normal_map_from_image(image_path):
     image = Image.open(image_path)
-    #width, height = image.size
+    width, height = image.size
+
+    image = image.convert("L")
 
     result = np.array(image) / 255
-    if (len(result.shape) == 3):
-        result = np.mean(result, axis=2)
 
     result = get_normal_map_from_heightmap(result)
     
-    # app = Krita.instance()
-    # doc = app.activeDocument()
-    # while width < doc.width() or height < doc.height():
-    #     result = reflect_vector_pattern(result)
-    #     width *= 2
-    #     height *= 2
+    app = Krita.instance()
+    doc = app.activeDocument()
+    while width < doc.width() or height < doc.height():
+        result = reflect_vector_pattern(result)
+        width *= 2
+        height *= 2
     return result
 
 def normal_map_to_image(normal_map, path):
     width, height, three = normal_map.shape
-    result = np.copy(normal_map)
+    result = normal_map
     result.resize(width, height, 3)
-    result *= 32768
-    result += np.ones(shape=(width, height, 3)) * 32768
-    result = result.astype("int32")
-    result1 = result // 256
-    result1 = np.clip(result1, 0, 255)
-    result2 = result % 256
-    result = np.append(result1, result2, 0)
+    result *= 128
+    result += np.ones(shape=(width, height, 3)) * 128
     result = result.astype("uint8")
     img = Image.fromarray(result, "RGB")
     img.save(path)
@@ -72,17 +67,9 @@ def get_normal_map_from_image(path):
     image = Image.open(path)
     width, height = image.size
     result = np.array(image).astype("float64")
-    first = result[:height//2]
-    second = result[height//2:]
-    result = first * 256 + second
-    height //= 2
     result.resize(width, height, 3)
-    result -= np.ones(shape=(width, height, 3)) * 32768
-    result = result / 32768
-
-    result = np.swapaxes(result, 0, 1)
-
-    width, height = height, width
+    result -= np.ones(shape=(width, height, 3)) * 128
+    result = result / 128
 
     app = Krita.instance()
     doc = app.activeDocument()
@@ -90,6 +77,8 @@ def get_normal_map_from_image(path):
         result = reflect_vector_pattern(result)
         width *= 2
         height *= 2
+
+    np.resize(result, (width, height))
 
     return result
 
@@ -149,11 +138,12 @@ def gen_funny_normal_map(width, height): #for testing only
 class Shading:
     def __init__(self):
         self.normal_map = np.array([])
+        self.uniqueId = None
 
     def set_normal_map(self, normal_map):
         self.normal_map = normal_map
 
-    def update_shadow_node(self, direction, doc, shadow_node): 
+    def update_shadow_node(self, direction, shadow_node): 
         #arguments: array of vectors, direction to the light source, document
         #all vector arguments should be normalised
         #normal_map and direction should both be numpy arrays
@@ -188,11 +178,19 @@ class Shading:
         
         app = Krita.instance()
         doc = app.activeDocument()
+        root = doc.rootNode()
 
-        shadow_node = doc.nodeByName(SHADOW_LAYER_NAME)
-        if shadow_node == None:
+        flag = False
+        for i, node in enumerate(root.childNodes()):
+            if node.uniqueId() == self.uniqueId:
+                shadow_node = node
+                flag = True
+
+        if not flag:
             shadow_node = doc.createNode(SHADOW_LAYER_NAME, "paintLayer")
+            shadow_node.setLocked(True)
             doc.rootNode().addChildNode(shadow_node, None)
+            self.uniqueId = shadow_node.uniqueId()
 
         #width = doc.width()
         #height = doc.height()
@@ -200,8 +198,10 @@ class Shading:
         #normal_map = gen_funny_normal_map(width, height)
 
         start_time = time.time()
-        self.update_shadow_node(direction, doc, shadow_node)
+        self.update_shadow_node(direction, shadow_node)
         end_time = time.time()
+
+        print(end_time - start_time)
 
         #doc.rootNode().addChildNode(shadow_node, None)
         doc.refreshProjection()
