@@ -13,8 +13,7 @@ stylesheet = """QPushButton {
                         color: #000;                    
                         border: 1px solid #000;     
                         font-size: 14px;              
-                        font-family: "Tahoma", sans-serif;
-                        border-radius: 6px; 
+                        border-radius: 4px; 
                         padding: 2px;           
                     }
                     QPushButton:hover {
@@ -115,7 +114,7 @@ class PaperDocker(DockWidget):
         doc = Krita.instance().activeDocument()
 
         assets = os.path.join(os.path.dirname(__file__), "../assets")
-        width, height, n = doc.width(), doc.height(), len(os.listdir(assets)) - 2
+        width, height, n = doc.width(), doc.height(), len(os.listdir(assets)) - 3
 
         if self.comboBox.currentText() == "Model 1: Crumpled":
             model_path = os.path.join(os.path.dirname(__file__), "models/crumpled-generator-006000_iterations.pth")
