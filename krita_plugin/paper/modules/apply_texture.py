@@ -4,7 +4,8 @@ import os
 import xml.etree.ElementTree as ET 
 import hashlib
 from PyQt5.QtGui import QImage
-from .contrast import qimage_contrast_adjust
+# Here lies Ken's once great, now tragically dead code
+# from .contrast import qimage_contrast_adjust
 from.contrast_failsafe import contrast_failsafe
 
 def make_texture(texture_path, pattern_name):
