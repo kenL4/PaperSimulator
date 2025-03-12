@@ -195,12 +195,12 @@ class LightDocker(DockWidget):
     def click(self):
         if not selection[0]:
             raise Exception("You need to select a paper!")
-        else:
-            if self.path != selection[0]:
-                self.path = selection[0]
-                normal_map = generate_normal_map_from_image(self.path)
-                self.shading.set_normal_map(normal_map)
-            self.shading.update(self.incidence.slider.value(), self.direction.slider.value(), self.intensity.slider.value())
+        
+        if self.path != selection[0]:
+            self.path = selection[0]
+            normal_map = generate_normal_map_from_image(self.path)
+            self.shading.set_normal_map(normal_map)
+        self.shading.update(self.incidence.slider.value(), self.direction.slider.value(), self.intensity.slider.value())
 
     def canvasChanged(self, canvas):
         pass
