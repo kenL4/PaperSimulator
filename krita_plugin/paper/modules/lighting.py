@@ -86,6 +86,7 @@ def get_normal_map_from_image(path):
 
     app = Krita.instance()
     doc = app.activeDocument()
+    result = np.tile(result, (2,2))
     while width < doc.width() or height < doc.height():
         result = reflect_vector_pattern(result)
         width *= 2
