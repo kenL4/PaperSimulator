@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from .lighting import *
+from .pdocker import selection
 import math
 
 class Incidence(QWidget):
@@ -174,11 +175,15 @@ class LightDocker(DockWidget):
         mainWidget = QWidget(self)
         self.setWidget(mainWidget)
 
+        self.path = None
+
         self.incidence = Incidence()
         self.direction = Direction()
         self.intensity = Intensity()
+        self.shading = Shading()
 
         button = QPushButton("Apply", mainWidget)
+        button.setToolTip("Works best at low angles of incidence.")
         button.clicked.connect(self.click)
 
         mainWidget.setLayout(QVBoxLayout())
@@ -188,18 +193,14 @@ class LightDocker(DockWidget):
         mainWidget.layout().addWidget(button)
 
     def click(self):
-        shading = Shading()
-        direction = np.array([0, 0, 0.2])
-        angle_radians = self.direction.slider.value() / 180 * math.pi
-        direction[0] = math.cos(angle_radians)
-        direction[1] = math.sin(angle_radians)
-        direction *= self.intensity.slider.value() / 15
-
-        if (shading.normal_map.shape[0] == 0):
-            app = Krita.instance()
-            doc = app.activeDocument()
-            shading.set_normal_map(gen_funny_normal_map(doc.width(), doc.height()))
-        shading.update_shading(direction)
+        if not selection[0]:
+            raise Exception("You need to select a paper!")
+        else:
+            if self.path != selection[0]:
+                self.path = selection[0]
+                normal_map = generate_normal_map_from_image(self.path)
+                self.shading.set_normal_map(normal_map)
+            self.shading.update(self.incidence.slider.value(), self.direction.slider.value(), self.intensity.slider.value())
 
     def canvasChanged(self, canvas):
         pass

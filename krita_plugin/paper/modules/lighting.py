@@ -138,6 +138,7 @@ def gen_funny_normal_map(width, height): #for testing only
 class Shading:
     def __init__(self):
         self.normal_map = np.array([])
+        self.uniqueId = None
 
     def set_normal_map(self, normal_map):
         self.normal_map = normal_map
@@ -177,11 +178,19 @@ class Shading:
         
         app = Krita.instance()
         doc = app.activeDocument()
+        root = doc.rootNode()
 
-        shadow_node = doc.nodeByName(SHADOW_LAYER_NAME)
-        if shadow_node == None:
+        flag = False
+        for i, node in enumerate(root.childNodes()):
+            if node.uniqueId() == self.uniqueId:
+                shadow_node = node
+                flag = True
+
+        if not flag:
             shadow_node = doc.createNode(SHADOW_LAYER_NAME, "paintLayer")
+            shadow_node.setLocked(True)
             doc.rootNode().addChildNode(shadow_node, None)
+            self.uniqueId = shadow_node.uniqueId()
 
         width = doc.width()
         height = doc.height()
