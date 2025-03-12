@@ -36,29 +36,34 @@ def get_normal_map_from_heightmap(heightmap_np):
     return normalMap
 
 def generate_normal_map_from_image(image_path):
-    image = Image.open(image_path)
-    width, height = image.size
+    dot = image_path.rfind(".")
+    new_path = image_path[:dot] + "_normal.png"
+    
+    if (Path(new_path).is_file()):
+        return get_normal_map_from_image(new_path)
 
-    image = image.convert("L")
+    image = Image.open(image_path)
+    #width, height = image.size
 
     result = np.array(image) / 255
+    if (len(result.shape) == 3):
+        result = np.mean(result, axis=2)
 
     result = get_normal_map_from_heightmap(result)
-    
-    app = Krita.instance()
-    doc = app.activeDocument()
-    while width < doc.width() or height < doc.height():
-        result = reflect_vector_pattern(result)
-        width *= 2
-        height *= 2
-    return result
+    normal_map_to_image(result, new_path)
+    return get_normal_map_from_image(new_path)
 
 def normal_map_to_image(normal_map, path):
     width, height, three = normal_map.shape
-    result = normal_map
+    result = np.copy(normal_map)
     result.resize(width, height, 3)
-    result *= 128
-    result += np.ones(shape=(width, height, 3)) * 128
+    result *= 32768
+    result += np.ones(shape=(width, height, 3)) * 32768
+    result = result.astype("int32")
+    result1 = result // 256
+    result1 = np.clip(result1, 0, 255)
+    result2 = result % 256
+    result = np.append(result1, result2, 0)
     result = result.astype("uint8")
     img = Image.fromarray(result, "RGB")
     img.save(path)
@@ -67,9 +72,17 @@ def get_normal_map_from_image(path):
     image = Image.open(path)
     width, height = image.size
     result = np.array(image).astype("float64")
+    first = result[:height//2]
+    second = result[height//2:]
+    result = first * 256 + second
+    height //= 2
     result.resize(width, height, 3)
-    result -= np.ones(shape=(width, height, 3)) * 128
-    result = result / 128
+    result -= np.ones(shape=(width, height, 3)) * 32768
+    result = result / 32768
+
+    result = np.swapaxes(result, 0, 1)
+
+    width, height = height, width
 
     app = Krita.instance()
     doc = app.activeDocument()
@@ -77,8 +90,6 @@ def get_normal_map_from_image(path):
         result = reflect_vector_pattern(result)
         width *= 2
         height *= 2
-
-    np.resize(result, (width, height))
 
     return result
 
