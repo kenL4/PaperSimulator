@@ -37,7 +37,9 @@ def get_normal_map_from_heightmap(heightmap_np):
 
 def generate_normal_map_from_image(image_path):
     dot = image_path.rfind(".")
-    new_path = image_path[:dot] + "_normal.png"
+    assets_index = image_path.rfind("assets")
+    name = image_path[assets_index + 6:dot]
+    new_path = image_path[:assets_index] + "normalMaps" + name + "_normal.png"
     
     if (Path(new_path).is_file()):
         return get_normal_map_from_image(new_path)
