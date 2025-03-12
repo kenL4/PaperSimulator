@@ -39,9 +39,9 @@ def generate_normal_map_from_image(image_path):
     image = Image.open(image_path)
     width, height = image.size
 
+    image = image.convert("L")
+
     result = np.array(image) / 255
-    if (len(result.shape) == 3):
-        result = np.mean(result, axis=2)
 
     result = get_normal_map_from_heightmap(result)
     
@@ -143,7 +143,7 @@ class Shading:
     def set_normal_map(self, normal_map):
         self.normal_map = normal_map
 
-    def update_shadow_node(self, direction, doc, shadow_node): 
+    def update_shadow_node(self, direction, shadow_node): 
         #arguments: array of vectors, direction to the light source, document
         #all vector arguments should be normalised
         #normal_map and direction should both be numpy arrays
@@ -192,13 +192,13 @@ class Shading:
             doc.rootNode().addChildNode(shadow_node, None)
             self.uniqueId = shadow_node.uniqueId()
 
-        width = doc.width()
-        height = doc.height()
+        #width = doc.width()
+        #height = doc.height()
 
         #normal_map = gen_funny_normal_map(width, height)
 
         start_time = time.time()
-        self.update_shadow_node(direction, doc, shadow_node)
+        self.update_shadow_node(direction, shadow_node)
         end_time = time.time()
 
         print(end_time - start_time)

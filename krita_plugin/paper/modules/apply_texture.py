@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 import hashlib
 from PyQt5.QtGui import QImage
 from .contrast import qimage_contrast_adjust
+from.contrast_failsafe import contrast_failsafe
 
 def make_texture(texture_path, pattern_name):
     path = Krita.instance().readSetting("", "ResourceDirectory", None)
@@ -19,7 +20,7 @@ def make_texture(texture_path, pattern_name):
     shutil.copyfile(texture_path, pattern_file_path)
     img = QImage(pattern_file_path).convertToFormat(QImage.Format.Format_RGB888)
     if img:
-        contrast_adjusted_img = qimage_contrast_adjust(img)
+        contrast_adjusted_img = contrast_failsafe(texture_path)
         contrast_adjusted_img.save(pattern_file_path)
     return pattern_file_path
 

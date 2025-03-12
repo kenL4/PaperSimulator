@@ -13,7 +13,7 @@ def contrast_failsafe(path):
     direction[1] = math.sin(angle_radians)
     incidence_angle = 1 / 180 * math.pi
     direction[2] = math.sin(incidence_angle)
-    direction *= (20 / 15)
+    direction *= (100 / 15)
         
     width = len(normal_map[0])
     height = len(normal_map)

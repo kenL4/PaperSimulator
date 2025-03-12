@@ -1,4 +1,7 @@
 from krita import *
+from PyQt5.QtGui import *
+from PyQt5.QtCore import *
+from .lighting import reflect_pattern
 
 def overlay_canvas(texture_pattern, id):
     doc = Krita.instance().activeDocument()
@@ -28,11 +31,11 @@ def overlay_canvas(texture_pattern, id):
     doc.refreshProjection()
     return fill_layer.uniqueId()
 
-def overlay_canvas_file(file_path, id):
+def overlay_canvas_file(file_path, file, id):
     doc = Krita.instance().activeDocument()
     root = doc.rootNode()
 
-    file_layer = doc.createFileLayer("Paper Texture", file_path, "ToImagePPI")
+    file_layer = doc.createFileLayer(file, file_path, "ToImagePPI")
     file_layer.setLocked(True)
 
     # deal with duplication
