@@ -57,9 +57,8 @@ class Paper(QWidget):
     def buttonclick(self):
         if not selection[0]:
             raise Exception("You need to select a paper!")
-        else:
-            apply_texture(selection[0], selection[1])
-        pass
+        
+        apply_texture(selection[0], selection[1])
 
 class PaperDocker(DockWidget):
     def __init__(self):
