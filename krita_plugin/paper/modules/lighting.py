@@ -4,6 +4,7 @@ import numpy as np
 import time
 from PIL import Image
 import pyvista as pv
+import os
 # sys.path.append("mesh_utils")
 # import get_mesh_data
 # import pointCloudGen
@@ -41,7 +42,7 @@ def generate_normal_map_from_image(image_path):
     name = image_path[assets_index + 6:dot]
     new_path = image_path[:assets_index] + "normalMaps" + name + "_normal.png"
     
-    if (Path(new_path).is_file()):
+    if (os.path.isfile(new_path)):
         return get_normal_map_from_image(new_path)
 
     image = Image.open(image_path)
