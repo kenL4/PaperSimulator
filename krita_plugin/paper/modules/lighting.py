@@ -89,8 +89,8 @@ def get_normal_map_from_image(path):
 
     app = Krita.instance()
     doc = app.activeDocument()
-    sf_width = (doc.width // width) + 1
-    sf_height = (doc.height // height) + 1
+    sf_width = (doc.width() // width) + 1
+    sf_height = (doc.height() // height) + 1
     result = np.tile(result, (sf_height, sf_width))
 
     '''
