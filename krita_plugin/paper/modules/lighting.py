@@ -203,8 +203,6 @@ class Shading:
         self.update_shadow_node(direction, doc, shadow_node)
         end_time = time.time()
 
-        print(end_time - start_time)
-
         #doc.rootNode().addChildNode(shadow_node, None)
         doc.refreshProjection()
 
