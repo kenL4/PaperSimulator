@@ -106,7 +106,7 @@ def get_normal_map_from_image(path):
         height *= 2
     '''
 
-    return result
+    return new_result
 
 def reflect_vector_pattern(top_left):
     #takes numpy array and reflects it to create a pattern tile that is 4 times the size of the regular array
