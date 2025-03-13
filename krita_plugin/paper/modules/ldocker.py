@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from PyQt5.QtCore import *
 from .lighting import *
-from .pdocker import selection, stylesheet
+from .pdocker import selection
 import math
 
 class Intensity(QWidget):
@@ -183,7 +183,6 @@ class LightDocker(DockWidget):
         self.shading = Shading()
 
         button = QPushButton("Apply", mainWidget)
-        button.setStyleSheet(stylesheet)
         button.setToolTip("Works best at low angles of incidence.")
         button.clicked.connect(self.click)
 

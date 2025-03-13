@@ -8,29 +8,6 @@ import os
 
 selection = [None]
 
-stylesheet = """QPushButton {
-                        background-color: #fff;      
-                        color: #000;                    
-                        border: 1px solid #000;     
-                        font-size: 14px;              
-                        border-radius: 4px; 
-                        padding: 2px;           
-                    }
-                    QPushButton:hover {
-                        background-color: #f0f0f0;    
-                        border: 2px solid #444;     
-                    }
-                    QPushButton:pressed {
-                        background-color: #ddd;       
-                        border: 2px solid #222;       
-                        color: #222;                  
-                    }
-                    QPushButton:disabled {
-                        background-color: #bbb;     
-                        color: #666;                  
-                        border: 2px solid #888;        
-                    }"""
-
 class Paper(QWidget):
     def __init__(self):
         super().__init__()
@@ -93,7 +70,6 @@ class PaperDocker(DockWidget):
         generate.clicked.connect(self.generateclick)
 
         apply = QPushButton("Apply")
-        apply.setStyleSheet(stylesheet)
         apply.setToolTip("Applies the selected texture to your brush.")
         apply.clicked.connect(self.applyclick)
 
