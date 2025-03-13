@@ -12,4 +12,5 @@
 >> b. Click the Open Resources Folder button. The pykrita folder is located here.
 > 2. Then go to Settings - Configure Krita - Python Plugin Manager and enable “Paper” and restart
 
-[Google Doc](https://docs.google.com/document/d/17TS37IrhFyxrfWdj7vg2TJcYq0m-6MT_nW4NX1FwWFA/edit?usp=sharing)
+## Dependencies
+> You will need python in the same version as your Krita, with numpy, pyvista, and pytorch installed.
